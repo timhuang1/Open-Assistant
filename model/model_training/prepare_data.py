@@ -11,9 +11,12 @@ import torch
 import sys
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+print(parent_dir)
+parent_dir = os.path.dirname(parent_dir)
+sys.path.append(parent_dir)
 print(parent_dir)
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 
 # from model_training.custom_datasets.formatting import DatasetEntry
 from model_training.custom_datasets.dialogue_collator import DialogueDataCollator
