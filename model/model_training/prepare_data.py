@@ -9,7 +9,7 @@ import datasets
 import torch
 
 import sys
-sys.path.insert(1, "/apdcephfs/share_916081/timxthuang/pyprojects/Open-Assistant/model/model_training")
+sys.path.insert(1, "/apdcephfs/share_916081/timxthuang/pyprojects/Open-Assistant/model")
 # from model_training.custom_datasets.formatting import DatasetEntry
 from model_training.custom_datasets.dialogue_collator import DialogueDataCollator
 from model_training.efficiency_utils import fuse_gelu
