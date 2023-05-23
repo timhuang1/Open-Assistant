@@ -107,24 +107,24 @@ pretrain:
   use_custom_sampler: true
   sort_by_length: false
   datasets:
-    # - alpaca_gpt4:
-    #     val_split: 0.025
-    #     max_val_set: 250
-    # - vicuna:
-    #     val_split: 0.025
-    #     max_val_set: 250
-    # - gpteacher_roleplay:
-    #     val_split: 0.05
+    - alpaca_gpt4:
+        val_split: 0.025
+        max_val_set: 250
+    - vicuna:
+        val_split: 0.025
+        max_val_set: 250
+    - gpteacher_roleplay:
+        val_split: 0.05
     # - red_pajama:
     #     fraction: 0.25
     #     max_val_set: 1000
-    # - wizardlm_70k:
-    #     val_split: 0.05
-    #     max_val_set: 500
-    # - joke:
-    #     val_split: 0.05
-    # - poem_instructions:
-    #     val_split: 0.025
+    - wizardlm_70k:
+        val_split: 0.05
+        max_val_set: 500
+    - joke:
+        val_split: 0.05
+    - poem_instructions:
+        val_split: 0.025
     # - oa_stackexchange:
     #     val_split: 0.05
     #     fraction: 0.1
@@ -374,8 +374,9 @@ sft-8-datasets:
   save_steps: 600
   datasets:
     - oasst_export:
-        lang: "bg,ca,cs,da,de,en,es,fr,hr,hu,it,nl,pl,pt,ro,ru,sl,sr,sv,uk" # sft-8.0
-        input_file_path: 2023-05-06_OASST_labels.jsonl.gz
+        # lang: "bg,ca,cs,da,de,en,es,fr,hr,hu,it,nl,pl,pt,ro,ru,sl,sr,sv,uk" # sft-8.0
+        lang: "en,es,ru,de,zh,fr" # sft-8.0
+        input_file_path: 2023-04-12_oasst_ready.trees.jsonl
         val_split: 0.05
     - dolly15k:
         val_split: 0.05

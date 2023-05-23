@@ -110,7 +110,7 @@ def argument_parsing(notebook=False, notebook_args=None):
     return parser.parse_args(remaining)
 
 
-def main():
+if __name__ == "__main__":
     training_conf = argument_parsing()
     if not training_conf.deepspeed or training_conf.local_rank == 0:
         print(f"trainig_conf = {training_conf}")
@@ -150,7 +150,3 @@ def main():
             print(f"{k}: {len(d)} ({len(d) / total_eval:.2%})")
         print(f"\nTotal eval: {total_eval}")
         print("-" * 80)
-
-
-if __name__ == "__main__":
-    main()
