@@ -120,11 +120,11 @@ if __name__ == "__main__":
     if training_conf.val_max_length is None:
         training_conf.val_max_length = training_conf.max_length
 
-    if "bloom_minus" in training_conf.model_name_or_path:
+    if "bloom_minus" in training_conf.model_name:
         import sys
         sys.path.insert(1, "/apdcephfs/share_916081/timxthuang/cond_gen_git/examples/pytorch")
         from utils import BloomMinusTokenizerFast
-        tokenizer = BloomMinusTokenizerFast.from_pretrained(training_conf.model_name_or_path)
+        tokenizer = BloomMinusTokenizerFast.from_pretrained(training_conf.model_name)
         additional_special_tokens = list(QA_SPECIAL_TOKENS.values())
         tokenizer.add_special_tokens({"additional_special_tokens": additional_special_tokens})
     else:
