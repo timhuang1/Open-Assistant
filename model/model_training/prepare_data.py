@@ -10,6 +10,12 @@ import numpy as np
 from functools import partial
 from collections import defaultdict
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from datasets import Dataset
+from transformers.tokenization_utils_base import PaddingStrategy, PreTrainedTokenizerBase, TruncationStrategy
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+sys.path.append(parent_dir)
+
 from model_training.custom_datasets.formatting import (
     QA_SPECIAL_TOKENS,
     DatasetEntryLm,
@@ -17,14 +23,6 @@ from model_training.custom_datasets.formatting import (
     format_pairs,
     format_system_prefix,
 )
-from datasets import Dataset
-from transformers.tokenization_utils_base import PaddingStrategy, PreTrainedTokenizerBase, TruncationStrategy
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
-
-
-# from model_training.custom_datasets.formatting import DatasetEntry
 from model_training.custom_datasets.dialogue_collator import DialogueDataCollator
 from model_training.utils.utils import (
     PerDatasetSampler,
@@ -283,7 +281,7 @@ if __name__ == "__main__":
     tokenized_datasets = dataset.map(
         messages_tokenize_function,
         batched=True,
-        num_proc=training_conf.preprocessing_num_workers,
+        num_proc=training_cofnf.preprocessing_num_workers,
         remove_columns=dataset.column_names,
         load_from_cache_file=False,
         desc="Running tokenizer on dataset",
