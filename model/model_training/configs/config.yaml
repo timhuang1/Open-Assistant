@@ -421,6 +421,15 @@ sft-8.1-datasets:
         fraction: 0.5
         val_split: 0.025
 
+sft-local-gather:
+  save_strategy: steps # epoch seems not to work, gets stuck with DS 0.9.1
+  save_steps: 600
+  datasets:
+    - oasst_export:
+        lang: "bg,ca,cs,da,de,en,es,fr,hr,hu,it,nl,pl,pt,ro,ru,sl,sr,sv,uk,vi,zh,ko,ja,th"
+        input_file_path: 2023-05-06_OASST_labels.jsonl.gz
+        val_split: 0.05
+
 llama-30b-pretrain:
   dtype: fp16
   log_dir: "llama_log_30b"

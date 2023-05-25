@@ -151,7 +151,9 @@ class DialogueDataCollator:
             _flatten_messages, _label_masks = [], []
             prev_short_msg, prev_short_mask = None, None
             for flatten_msg, label_mask in zip(flatten_messages, label_masks):
-                if len(flatten_msg.input_ids) < self.mix_length_threshold and random.random() > self.mix_probability:
+                # if len(flatten_msg.input_ids) < self.mix_length_threshold and random.random() > self.mix_probability:
+                if len(flatten_msg["input_ids"]) < self.mix_length_threshold\
+                        and random.random() > self.mix_probability:    
                     if prev_short_msg is not None:
                         for key in flatten_msg.keys():
                             flatten_msg[key] += prev_short_msg[key]
