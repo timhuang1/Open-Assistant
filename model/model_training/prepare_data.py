@@ -1,22 +1,31 @@
 import argparse
 import logging
 import os
-from functools import partial
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-
+import copy
 import datasets
 import torch
-
 import sys
+import random
+import numpy as np
+from functools import partial
+from collections import defaultdict
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from model_training.custom_datasets.formatting import (
+    QA_SPECIAL_TOKENS,
+    DatasetEntryLm,
+    DatasetEntrySft,
+    format_pairs,
+    format_system_prefix,
+)
+from datasets import Dataset
+from transformers.tokenization_utils_base import PaddingStrategy, PreTrainedTokenizerBase, TruncationStrategy
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
-print(parent_dir)
 
 
 # from model_training.custom_datasets.formatting import DatasetEntry
 from model_training.custom_datasets.dialogue_collator import DialogueDataCollator
-from model_training.efficiency_utils import fuse_gelu
 from model_training.utils.utils import (
     PerDatasetSampler,
     _strtobool,
@@ -31,11 +40,6 @@ from model_training.utils.utils import (
 from torch import nn
 from torch.utils.data import DataLoader, Subset
 from tqdm import tqdm
-from transformers import PreTrainedModel, Trainer, TrainingArguments
-from transformers.trainer_pt_utils import IterableDatasetShard
-from transformers.trainer_utils import seed_worker
-from transformers.training_args import OptimizerNames
-from transformers.utils import is_datasets_available
 
 
 def argument_parsing(notebook=False, notebook_args=None):
@@ -118,6 +122,30 @@ if __name__ == "__main__":
     if training_conf.val_max_length is None:
         training_conf.val_max_length = training_conf.max_length
 
+    if "bloom_minus" in training_conf.model_name_or_path:
+        import sys
+        sys.path.insert(1, "/apdcephfs/share_916081/timxthuang/cond_gen_git/examples/pytorch")
+        from utils import BloomMinusTokenizerFast
+        tokenizer = BloomMinusTokenizerFast.from_pretrained(training_conf.model_name_or_path)
+        additional_special_tokens = list(QA_SPECIAL_TOKENS.values())
+        tokenizer.add_special_tokens({"additional_special_tokens": additional_special_tokens})
+    else:
+        tokenizer = get_tokenizer(training_conf)
+
+    collate_fn = DialogueDataCollator(
+        tokenizer,
+        max_length=training_conf.max_length,
+        random_offset_probability=training_conf.random_offset_probability,
+        label_masking=training_conf.label_masking,
+        samples_mixing=training_conf.samples_mixing,
+        pad_to_multiple_of=16,
+        use_system_prefix=training_conf.use_system_prefix,
+        system_prefix=training_conf.system_prefix,
+        use_system_tag=training_conf.use_system_tag,
+        system_property_dropout=training_conf.system_property_dropout,
+        system_add_length=training_conf.system_add_length,
+    )
+
     train, evals = get_dataset(training_conf)
 
     show_dataset_stats = (training_conf.verbose or training_conf.show_dataset_stats) and (
@@ -137,11 +165,6 @@ if __name__ == "__main__":
                     name += f" ({d.name})"
             print(f"{name}: {len(d)} ({len(d) / total:.2%})")
 
-            # ensure that all entries can be formatted
-            # for x in d:
-            #     if isinstance(x, DatasetEntry):
-            #         x.get_formatted("sft", "<eos>")
-
         print(f"\nTotal train: {total}")
         print("-" * 80)
         print("Evaluation set sizes:")
@@ -150,3 +173,119 @@ if __name__ == "__main__":
             print(f"{k}: {len(d)} ({len(d) / total_eval:.2%})")
         print(f"\nTotal eval: {total_eval}")
         print("-" * 80)
+
+    def raw_to_arraw(features: List[Union[DatasetEntrySft, DatasetEntryLm]]) -> List[Dict[str, List[str]]]:
+        all_res = list()
+        for messages in features:
+            pretrain_dataset = False
+            if isinstance(messages, DatasetEntrySft):
+                messages = messages.get_formatted(
+                    eos_token=collate_fn.tokenizer.eos_token,
+                    use_system_tag=collate_fn.use_system_tag,
+                    system_property_dropout=collate_fn.system_property_dropout,
+                    system_add_length=collate_fn.system_add_length,
+                )
+            elif isinstance(messages, DatasetEntryLm):
+                messages = messages.text
+                pretrain_dataset = True
+            else:
+                messages = list(messages)
+                messages = format_pairs(messages, collate_fn.tokenizer.eos_token)
+            all_res.append({"messages": messages, "pretrain_dataset": pretrain_dataset})
+        return all_res
+
+    def messages_tokenize_function(examples: Dict[str, List[List[Union[str, bool]]]]) -> Dict[str, List[int]]:
+        all_messages = examples["messages"]
+        is_pretrain_labels = examples["pretrain_dataset"]
+        res = defaultdict(list)
+        for messages, is_pretrain in zip(all_messages, is_pretrain_labels):
+            if random.random() < collate_fn.random_offset_probability\
+                    and not is_pretrain:
+                truncation = TruncationStrategy.DO_NOT_TRUNCATE
+                max_length = None
+            else:
+                truncation = TruncationStrategy.LONGEST_FIRST
+                max_length = collate_fn.max_length
+            flatten_message = collate_fn.tokenizer(
+                "".join(messages),
+                max_length=max_length,
+                truncation=truncation,
+                padding=False,
+            )
+            if is_pretrain:
+                label_mask = np.ones(len(flatten_message.input_ids), dtype=bool)
+                # return flatten_message, label_mask, 0
+                for k, v in flatten_message.items():
+                    if k != "offset_mapping":
+                        res[k].append(v)
+                res["labels"].append(flatten_message["input_ids"])
+                continue
+
+            message_indices: Optional[list[int]] = None
+            if collate_fn.label_masking:
+                # message_change_indices = np.cumsum([len(x) for x in messages])
+                # for each token an integer indicating the index of the message it belongs to. Just to create the label mask.
+                # Label mask is true when predicting a token that is part of the answer, false otherwise.
+                # TEXT:             Question: Hello, how are you? Answer: I am fine. Question: What is your name? Answer: My name is John.
+                # MESSAGE_INDICES:  0         0      0   0   0    1       1 1  1     2         2    2  2    2     3       3  3    3  3
+                # LABEL_MASK:       0         0      0   0   0    1       1 1  1     0         0    0  0    0     1       1  1    1  1
+                # 
+                # If no result in next, we are predicting the last termination token(s)
+                # message_indices = list(
+                #     map(
+                #         lambda x: next((i for i, val in enumerate(message_change_indices) if val >= x)),
+                #         list(map(lambda x: x[1], flatten_message.offset_mapping)),
+                #     )
+                # )
+                prompter_token_id = collate_fn.tokenizer.convert_tokens_to_ids(QA_SPECIAL_TOKENS["Question"])
+                assistant_token_id = collate_fn.tokenizer.convert_tokens_to_ids(QA_SPECIAL_TOKENS["Answer"])
+                assert prompter_token_id >= 0 and assistant_token_id >= 0
+                message_indices = []
+                i = -1
+                for x in flatten_message.input_ids:
+                    if x in (prompter_token_id, assistant_token_id):
+                        i += 1
+                    message_indices.append(i)
+            input_length = len(flatten_message.input_ids)
+
+            if collate_fn.max_length and input_length > collate_fn.max_length:
+                offset = random.randint(0, input_length - collate_fn.max_length)
+                for k in flatten_message.keys():
+                    v = flatten_message[k]
+                    if isinstance(v, list) and len(v) == input_length:
+                        flatten_message[k] = v[offset : offset + collate_fn.max_length]
+                if message_indices:
+                    message_indices = message_indices[offset : offset + collate_fn.max_length]
+
+            if collate_fn.label_masking:
+                label_mask = np.array(list(map(lambda x: x % 2 == 1, message_indices)))
+            else:
+                label_mask = np.ones(len(flatten_message.input_ids), dtype=bool)
+            # 
+            label_mask[-1] = False  # make sure last token is inactive, has an effect only when truncating
+            # 
+            # if len(flatten_message.input_ids) < collate_fn.mix_length_threshold and collate_fn.samples_mixing:
+            #     total_short_context_one += len(flatten_message.input_ids)
+            # {k: v for k, v in flatten_message.items() if k != "offset_mapping"}
+            for k, v in flatten_message.items():
+                if k != "offset_mapping":
+                    res[k].append(v)
+            res["label_mask"].append(label_mask)
+            # res["labels"] = [[-100] * len(src_ids) + tgt_ids for src_ids, tgt_ids in zip(model_inputs["input_ids"], labels["input_ids"])]
+            labels = np.array(flatten_message.input_ids)
+            labels[~label_mask] = -100
+            res["labels"].append(labels)
+        return res
+
+    train_instances = copy.copy([train[idx] for idx in range(len(train))])
+    dict_batch = raw_to_arraw(train_instances)
+    dataset = Dataset.from_list(dict_batch)
+    tokenized_datasets = dataset.map(
+        messages_tokenize_function,
+        batched=True,
+        num_proc=training_conf.preprocessing_num_workers,
+        remove_columns=dataset.column_names,
+        load_from_cache_file=False,
+        desc="Running tokenizer on dataset",
+    )
+    tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, training_conf.dataset_save_subname))
