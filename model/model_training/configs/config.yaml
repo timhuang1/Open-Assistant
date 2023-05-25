@@ -187,8 +187,11 @@ oasst_only:
   save_strategy: epoch
   datasets:
     - oasst_export:
-        lang: "bg,ca,cs,da,de,en,es,fr,hr,hu,it,nl,pl,pt,ro,ru,sl,sr,sv,uk"
-        input_file_path: 2023-04-04_oasst_ready.jsonl.gz
+        # lang: "bg,ca,cs,da,de,en,es,fr,hr,hu,it,nl,pl,pt,ro,ru,sl,sr,sv,uk"
+        # input_file_path: 2023-04-04_oasst_ready.jsonl.gz
+        # val_split: 0.05
+        lang: "en,es,ru,de,zh,fr" # sft-8.0
+        input_file_path: 2023-04-12_oasst_ready.trees.jsonl
         val_split: 0.05
   sort_by_length: false
   use_custom_sampler: false
