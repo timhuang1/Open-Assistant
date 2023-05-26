@@ -85,6 +85,7 @@ def argument_parsing(notebook=False, notebook_args=None):
         print(f'Error: Could not find the config "{e.args[0]}" in config.yaml')
         exit(1)
 
+    conf["configs"] = [name for name in args.configs]
     conf["wandb_entity"] = args.wandb_entity
     conf["local_rank"] = args.local_rank
     conf["deepspeed"] = args.deepspeed
@@ -277,15 +278,15 @@ if __name__ == "__main__":
             res["labels"].append(labels)
         return res
 
-    train_instances = copy.copy([train[idx] for idx in range(len(train))])
-    dict_batch = raw_to_arraw(train_instances)
-    dataset = Dataset.from_list(dict_batch)
-    tokenized_datasets = dataset.map(
-        messages_tokenize_function,
-        batched=True,
-        num_proc=training_conf.preprocessing_num_workers,
-        remove_columns=dataset.column_names,
-        load_from_cache_file=False,
-        desc="Running tokenizer on dataset",
-    )
-    tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, training_conf.dataset_save_subname))
+    if "ds_save_to_local" in training_conf.configs:
+        dict_batch = raw_to_arraw(train)
+        dataset = Dataset.from_list(dict_batch)
+        tokenized_datasets = dataset.map(
+            messages_tokenize_function,
+            batched=True,
+            num_proc=training_conf.preprocessing_num_workers,
+            remove_columns=dataset.column_names,
+            load_from_cache_file=False,
+            desc="Running tokenizer on dataset",
+        )
+        tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, training_conf.dataset_save_subname))

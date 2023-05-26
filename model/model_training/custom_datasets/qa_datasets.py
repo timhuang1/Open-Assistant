@@ -188,12 +188,12 @@ class QADataset(Dataset):
 class WebGPT(Dataset):
     name = "webgpt"
 
-    def __init__(self, mode: str = "sft", max_answers: int = 5) -> None:
+    def __init__(self, cache_dir: str | Path, mode: str = "sft", max_answers: int = 5) -> None:
         super().__init__()
         self.mode = mode
         assert mode in ("sft", "rm", "rl")
 
-        dataset = load_dataset("openai/webgpt_comparisons")
+        dataset = load_dataset("openai/webgpt_comparisons", cache_dir=cache_dir)
 
         self.rows = []
 

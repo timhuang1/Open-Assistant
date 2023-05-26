@@ -121,7 +121,7 @@ def get_one_dataset(
     elif dataset_name == "dive_mt":
         dataset = DiveMT()
     elif dataset_name == "webgpt":
-        dataset = WebGPT(mode=mode)
+        dataset = WebGPT(mode=mode, cache_dir=data_path)
     elif dataset_name in ("alpaca", "code_alpaca"):
         train, eval = load_alpaca_dataset(dataset_name, val_split=val_split, cache_dir=data_path, **kwargs)
     elif dataset_name == "gpt4all":
