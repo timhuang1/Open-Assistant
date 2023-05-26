@@ -100,7 +100,7 @@ per_digit_tokens:
 ds_save_to_local:
   preprocessing_num_workers: 10
   dataset_save_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/processed_dataset
-  dataset_save_subname: oasst_only
+  dataset_save_subname: oa_pretrain_collection
 
 math:
   datasets_extra: # Will get merged with datasets
