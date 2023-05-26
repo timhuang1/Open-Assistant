@@ -174,7 +174,9 @@ if __name__ == "__main__":
 
     def raw_to_arraw(features: List[Union[DatasetEntrySft, DatasetEntryLm]]) -> List[Dict[str, List[str]]]:
         all_res = list()
+        progress_bar = tqdm(range(len(features)), )
         for messages in features:
+            progress_bar.update(1)
             pretrain_dataset = False
             if isinstance(messages, DatasetEntrySft):
                 messages = messages.get_formatted(

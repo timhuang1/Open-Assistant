@@ -13,7 +13,7 @@ import yaml
 from model_training.custom_datasets import get_one_dataset
 from model_training.custom_datasets.formatting import QA_SPECIAL_TOKENS
 from model_training.models import freeze_top_n_layers, get_specific_model
-from model_training.models.patching import patch_model
+
 from model_training.models.reward_model import GPTNeoXRewardModel
 from sklearn.model_selection import train_test_split
 from tokenizers import pre_tokenizers
@@ -292,6 +292,7 @@ def get_metrics(conf, tokenizer):
 
 
 def get_model(conf, tokenizer, pad_vocab_size_to_multiple_of=16, check_freeze_layer=True):
+    from model_training.models.patching import patch_model
     dtype = torch.float32
     if conf.dtype in ["fp16", "float16"]:
         dtype = torch.float16
