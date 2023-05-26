@@ -12,6 +12,7 @@ from collections import defaultdict
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from datasets import Dataset
 from transformers.tokenization_utils_base import PaddingStrategy, PreTrainedTokenizerBase, TruncationStrategy
+from multiprocessing import Pool
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 sys.path.append(parent_dir)
@@ -145,7 +146,19 @@ if __name__ == "__main__":
         system_add_length=training_conf.system_add_length,
     )
 
-    train, evals = get_dataset(training_conf)
+    if "get_local_dataset" in training_conf.configs:
+        train_file, eval_file =\
+            os.path.join(training_conf.local_dataset_dir, f"{training_conf.local_dataset_subname}_train.pt"),\
+            os.path.join(training_conf.local_dataset_dir, f"{training_conf.local_dataset_subname}_evals.pt")
+        assert os.path.isfile(train_file) and os.path.isfile(eval_file), f"Invalid local_dataset file: {train_file}, {eval_file}"
+        train, evals = torch.load(train_file), torch.load(eval_file)
+    else:
+        train, evals = get_dataset(training_conf)
+    
+    if "concat_save_to_local" in training_conf.configs:
+        os.makedirs(training_conf.concat_save_dir, exist_ok=True)
+        torch.save(train, os.path.join(training_conf.concat_save_dir, f"{training_conf.concat_save_subname}_train.pt"))
+        torch.save(evals, os.path.join(training_conf.concat_save_dir, f"{training_conf.concat_save_subname}_evals.pt"))
 
     show_dataset_stats = (training_conf.verbose or training_conf.show_dataset_stats) and (
         not training_conf.deepspeed or training_conf.local_rank == 0
@@ -173,29 +186,30 @@ if __name__ == "__main__":
         print(f"\nTotal eval: {total_eval}")
         print("-" * 80)
 
-    def raw_to_arraw(features: List[Union[DatasetEntrySft, DatasetEntryLm]]) -> List[Dict[str, List[str]]]:
-        all_res = list()
-        progress_bar = tqdm(range(len(features)), )
-        for messages in features:
-            progress_bar.update(1)
-            pretrain_dataset = False
-            if isinstance(messages, DatasetEntrySft):
-                messages = messages.get_formatted(
-                    eos_token=collate_fn.tokenizer.eos_token,
-                    use_system_tag=collate_fn.use_system_tag,
-                    system_property_dropout=collate_fn.system_property_dropout,
-                    system_add_length=collate_fn.system_add_length,
-                )
-            elif isinstance(messages, DatasetEntryLm):
-                messages = messages.text
-                pretrain_dataset = True
-            else:
-                messages = list(messages)
-                messages = format_pairs(messages, collate_fn.tokenizer.eos_token)
-            all_res.append({"messages": messages, "pretrain_dataset": pretrain_dataset})
-        return all_res
+    def raw_to_arraw(
+        messages: Union[DatasetEntrySft, DatasetEntryLm]
+    ) -> Dict[str, List[str]]:
+        pretrain_dataset = False
+        if isinstance(messages, DatasetEntrySft):
+            messages = messages.get_formatted(
+                eos_token=collate_fn.tokenizer.eos_token,
+                use_system_tag=collate_fn.use_system_tag,
+                system_property_dropout=collate_fn.system_property_dropout,
+                system_add_length=collate_fn.system_add_length,
+            )
+        elif isinstance(messages, DatasetEntryLm):
+            messages = messages.text
+            pretrain_dataset = True
+        else:
+            messages = list(messages)
+            messages = format_pairs(messages, collate_fn.tokenizer.eos_token)
+        res = {"messages": messages, "pretrain_dataset": pretrain_dataset}
+        return res
 
-    def messages_tokenize_function(examples: Dict[str, List[List[Union[str, bool]]]]) -> Dict[str, List[int]]:
+    def messages_tokenize_function(
+        examples: Dict[str, List[List[Union[str, bool]]]]
+    ) -> Dict[str, List[int]]:
+        # details refer to DialogueDataCollator
         all_messages = examples["messages"]
         is_pretrain_labels = examples["pretrain_dataset"]
         res = defaultdict(list)
@@ -224,20 +238,6 @@ if __name__ == "__main__":
 
             message_indices: Optional[list[int]] = None
             if collate_fn.label_masking:
-                # message_change_indices = np.cumsum([len(x) for x in messages])
-                # for each token an integer indicating the index of the message it belongs to. Just to create the label mask.
-                # Label mask is true when predicting a token that is part of the answer, false otherwise.
-                # TEXT:             Question: Hello, how are you? Answer: I am fine. Question: What is your name? Answer: My name is John.
-                # MESSAGE_INDICES:  0         0      0   0   0    1       1 1  1     2         2    2  2    2     3       3  3    3  3
-                # LABEL_MASK:       0         0      0   0   0    1       1 1  1     0         0    0  0    0     1       1  1    1  1
-                # 
-                # If no result in next, we are predicting the last termination token(s)
-                # message_indices = list(
-                #     map(
-                #         lambda x: next((i for i, val in enumerate(message_change_indices) if val >= x)),
-                #         list(map(lambda x: x[1], flatten_message.offset_mapping)),
-                #     )
-                # )
                 prompter_token_id = collate_fn.tokenizer.convert_tokens_to_ids(QA_SPECIAL_TOKENS["Question"])
                 assistant_token_id = collate_fn.tokenizer.convert_tokens_to_ids(QA_SPECIAL_TOKENS["Answer"])
                 assert prompter_token_id >= 0 and assistant_token_id >= 0
@@ -262,12 +262,9 @@ if __name__ == "__main__":
                 label_mask = np.array(list(map(lambda x: x % 2 == 1, message_indices)))
             else:
                 label_mask = np.ones(len(flatten_message.input_ids), dtype=bool)
-            # 
+
             label_mask[-1] = False  # make sure last token is inactive, has an effect only when truncating
-            # 
-            # if len(flatten_message.input_ids) < collate_fn.mix_length_threshold and collate_fn.samples_mixing:
-            #     total_short_context_one += len(flatten_message.input_ids)
-            # {k: v for k, v in flatten_message.items() if k != "offset_mapping"}
+
             for k, v in flatten_message.items():
                 if k != "offset_mapping":
                     res[k].append(v)
@@ -278,9 +275,17 @@ if __name__ == "__main__":
             res["labels"].append(labels)
         return res
 
+    def multiprocess_helper(index):
+        # This function will be run in a separate process
+        data = train[index]
+        return raw_to_arraw(data)
+
     if "ds_save_to_local" in training_conf.configs:
-        dict_batch = raw_to_arraw(train)
-        dataset = Dataset.from_list(dict_batch)
+        # dict_batch = raw_to_arraw(train)
+        with Pool(training_conf.preprocessing_num_workers) as pool:
+            # Use the pool's map function to apply process_data to each index in the dataset
+            processed_dataset = list(pool.map(multiprocess_helper, range(len(train))))
+        dataset = Dataset.from_list(processed_dataset)
         tokenized_datasets = dataset.map(
             messages_tokenize_function,
             batched=True,
