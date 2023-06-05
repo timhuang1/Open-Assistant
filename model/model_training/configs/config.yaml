@@ -215,6 +215,7 @@ oasst_only:
 write_tree_only:
   save_strategy: epoch
   datasets:
+    - alpaca
     - en_write_tree:
         val_split: 0.05
         input_file_path: merges_en.jsonl
