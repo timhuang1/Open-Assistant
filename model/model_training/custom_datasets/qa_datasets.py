@@ -456,7 +456,7 @@ def load_alpaca_dataset(
     elif dataset_name == "code_alpaca":
         dataset = load_dataset("sahil2801/CodeAlpaca-20k", cache_dir=cache_dir)
     elif dataset_name in ("en_write_tree", "zh_write_tree"):
-        assert (input_file_path := kwargs.get("write_tree") is not None), "Loading write_tree data requires passing input_file_path"
+        assert (input_file_path := kwargs.get("input_file_path") is not None), "Loading write_tree data requires passing input_file_path"
         data_path = cache_dir
         if not isinstance(input_file_path, Path):
             input_file_path = Path(input_file_path)
@@ -464,8 +464,9 @@ def load_alpaca_dataset(
             if not isinstance(data_path, Path):
                 data_path = Path(data_path)
             input_file_path = data_path / input_file_path
-        dataset = load_dataset(input_file_path, cache_dir=cache_dir)
         
+        dataset = load_dataset(input_file_path, cache_dir=cache_dir)
+
     else:
         raise ValueError(f"Expected dataset_name to be 'alapaca' or 'code_alpaca'. Received {dataset_name}.")
 
