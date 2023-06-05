@@ -190,6 +190,14 @@ pretrain:
     - dolly15k:
         val_split: 0.05
         max_val_set: 300
+    - en_write_tree:
+        val_split: 0.05
+        input_file_path: merges_en.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/subsets/en/write_tree/final
+    - zh_write_tree:
+        val_split: 0.05
+        input_file_path: merge_0428_clean_ds.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/subsets/zh/write_tree/final
 
 oasst_only:
   save_strategy: epoch
@@ -203,6 +211,21 @@ oasst_only:
         val_split: 0.05
   sort_by_length: false
   use_custom_sampler: false
+
+write_tree_only:
+  save_strategy: epoch
+  datasets:
+    - en_write_tree:
+        val_split: 0.05
+        input_file_path: merges_en.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/subsets/en/write_tree/final
+    - zh_write_tree:
+        val_split: 0.05
+        input_file_path: merge_0428_clean_ds.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/subsets/zh/write_tree/final
+  sort_by_length: false
+  use_custom_sampler: false
+
 
 reference-data:
   datasets:

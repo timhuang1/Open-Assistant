@@ -172,6 +172,8 @@ def get_one_dataset(
         dataset = RedPajama(cache_dir=data_path, mode=mode, **kwargs)
     elif dataset_name == "gpteacher_roleplay":
         dataset = GPTeacher_Roleplay(cache_dir=data_path, mode=mode, **kwargs)
+    elif dataset_name in ("en_write_tree", "zh_write_tree"):
+        dataset = load_alpaca_dataset(cache_dir=data_path, mode=mode, **kwargs)
     else:
         raise ValueError(f"Unknown dataset {dataset_name}")
 

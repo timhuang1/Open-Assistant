@@ -429,6 +429,7 @@ def load_alpaca_dataset(
     cache_dir: str,
     mode: str = "sft",
     manual_seed: int = 287631038922,
+    **kwargs
 ) -> tuple[AlpacaBaseDataset, AlpacaBaseDataset]:
     generator = Generator()
     generator.manual_seed(manual_seed)
@@ -454,6 +455,17 @@ def load_alpaca_dataset(
         dataset = load_dataset("yahma/alpaca-cleaned", cache_dir=cache_dir)
     elif dataset_name == "code_alpaca":
         dataset = load_dataset("sahil2801/CodeAlpaca-20k", cache_dir=cache_dir)
+    elif dataset_name in ("en_write_tree", "zh_write_tree"):
+        assert (input_file_path := kwargs.get("write_tree") is not None), "Loading write_tree data requires passing input_file_path"
+        data_path = cache_dir
+        if not isinstance(input_file_path, Path):
+            input_file_path = Path(input_file_path)
+        if not input_file_path.is_absolute() and data_path:
+            if not isinstance(data_path, Path):
+                data_path = Path(data_path)
+            input_file_path = data_path / input_file_path
+        dataset = load_dataset(input_file_path, cache_dir=cache_dir)
+        
     else:
         raise ValueError(f"Expected dataset_name to be 'alapaca' or 'code_alpaca'. Received {dataset_name}.")
 
