@@ -173,7 +173,7 @@ def get_one_dataset(
     elif dataset_name == "gpteacher_roleplay":
         dataset = GPTeacher_Roleplay(cache_dir=data_path, mode=mode, **kwargs)
     elif dataset_name in ("en_write_tree", "zh_write_tree"):
-        dataset = load_alpaca_dataset(dataset_name, val_split=val_split, cache_dir=data_path, mode=mode, **kwargs)
+        train, eval = load_alpaca_dataset(dataset_name, val_split=val_split, cache_dir=data_path, mode=mode, **kwargs)
     else:
         raise ValueError(f"Unknown dataset {dataset_name}")
 
