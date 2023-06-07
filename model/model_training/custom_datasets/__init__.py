@@ -75,10 +75,11 @@ RM_DATASETS = [
 LOCAL_QA_DATASETS = [
     "en_write_tree",
     "zh_write_tree",
+    "local_zhihu-kol",
 ]
 
 LOCAL_DIALOG_DATASETS = [
-    "",
+    "share_gpt_zh",
 ]
 
 
