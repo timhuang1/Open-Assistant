@@ -503,7 +503,7 @@ class LocalQA(Dataset):
             }
         )
         dataset = load_dataset(data_dir, data_files=input_file_path, features=dataset_feature, cache_dir=cache_dir)
-        self.pairs = self.process_qa_samples(dataset)
+        self.pairs = self.process_qa_samples(dataset["train"])
 
     def process_qa_samples(self, dataset: Dataset) -> list[DatasetEntry]:
         data = []
