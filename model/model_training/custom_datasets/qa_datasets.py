@@ -494,7 +494,7 @@ class LocalDialogue(Dataset):
             raise NotImplementedError(f"Currently only the modes 'sft' and 'rl' are implemented. Received {mode}.")
         self.mode = mode
         self.name = dataset_name
-        assert (input_file_path := kwargs.get("input_file_path")) is not None, "Loading LocalQA ds requires passing input_file_path"
+        assert (input_file_path := kwargs.get("input_file_path")) is not None, "Loading LocalDialogue ds requires passing input_file_path"
         dataset = load_dataset(data_dir, data_files=input_file_path, cache_dir=cache_dir)
         # self.pairs = self.process_dialog_samples(dataset["train"])
         self.pairs = list()
