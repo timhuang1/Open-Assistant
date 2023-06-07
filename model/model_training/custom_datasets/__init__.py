@@ -22,6 +22,7 @@ from model_training.custom_datasets.qa_datasets import (
     WebGPT,
     load_alpaca_dataset,
     LocalQA,
+    LocalDialogue,
 )
 from model_training.custom_datasets.rank_datasets import AugmentedOA
 from model_training.custom_datasets.summarization import HFSummary, HFSummaryPairs, SummarizationDataset
@@ -69,6 +70,15 @@ RM_DATASETS = [
     "shp",
     "hellaswag",
     "webgpt",
+]
+
+LOCAL_QA_DATASETS = [
+    "en_write_tree",
+    "zh_write_tree",
+]
+
+LOCAL_DIALOG_DATASETS = [
+    "",
 ]
 
 
@@ -174,9 +184,10 @@ def get_one_dataset(
         dataset = RedPajama(cache_dir=data_path, mode=mode, **kwargs)
     elif dataset_name == "gpteacher_roleplay":
         dataset = GPTeacher_Roleplay(cache_dir=data_path, mode=mode, **kwargs)
-    elif dataset_name in ("en_write_tree", "zh_write_tree"):
-        # train, eval = load_alpaca_dataset(dataset_name, val_split=val_split, cache_dir=data_path, mode=mode, **kwargs)
+    elif dataset_name in LOCAL_QA_DATASETS:
         dataset = LocalQA(dataset_name, data_dir=data_path, cache_dir=cache_dir, mode=mode, **kwargs)
+    elif dataset_name in LOCAL_DIALOG_DATASETS:
+        dataset = LocalDialogue(dataset_name, data_dir=data_path, cache_dir=cache_dir, mode=mode, **kwargs)
     else:
         raise ValueError(f"Unknown dataset {dataset_name}")
 

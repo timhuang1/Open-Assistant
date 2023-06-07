@@ -476,6 +476,45 @@ def load_alpaca_dataset(
     return train, val
 
 
+class LocalDialogue(Dataset):
+
+    def __init__(
+        self,
+        dataset_name: str,
+        data_dir: str | Path,
+        cache_dir: str | Path,
+        mode: str = "sft",
+        input_max_length: int = 32 * 1024,
+        manual_seed: int = 287631038922,
+        **kwargs
+    ) -> None:
+        super().__init__()
+        
+        if mode not in ("sft", "rl"):
+            raise NotImplementedError(f"Currently only the modes 'sft' and 'rl' are implemented. Received {mode}.")
+        self.mode = mode
+        self.name = dataset_name
+        assert (input_file_path := kwargs.get("input_file_path")) is not None, "Loading LocalQA ds requires passing input_file_path"
+        dataset = load_dataset(data_dir, data_files=input_file_path, cache_dir=cache_dir)
+        # self.pairs = self.process_dialog_samples(dataset["train"])
+        self.pairs = list()
+        for data in dataset:
+            if (qa := Vicuna.process_vicuna_conversations(data, input_max_length=input_max_length)) is not None:
+                if len(qa[0]) > 0 and len(qa[0]) == len(qa[1]):
+                    self.pairs.append(create_dataset_entry_qa(mode="sft", questions=qa[0], answers=qa[1], ))
+
+    def __len__(self) -> int:
+        return len(self.pairs)
+
+    def __getitem__(self, index: int) -> DatasetEntry:
+        dialogue = self.pairs[index]
+        return dialogue
+
+    def process_dialog_samples(self, dataset: Dataset) -> list[DatasetEntry]:
+    
+        return
+
+
 class LocalQA(Dataset):
 
     def __init__(
