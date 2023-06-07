@@ -495,8 +495,9 @@ class LocalDialogue(Dataset):
         self.mode = mode
         self.name = dataset_name
         assert (input_file_path := kwargs.get("input_file_path")) is not None, "Loading LocalDialogue ds requires passing input_file_path"
-        dataset = load_dataset(data_dir, data_files=input_file_path, cache_dir=cache_dir)
+        # dataset = load_dataset(data_dir, data_files=input_file_path, cache_dir=cache_dir)
         # self.pairs = self.process_dialog_samples(dataset["train"])
+        dataset = [json.load(ln) for ln in open(os.path.join(data_dir, input_file_path))]
         self.pairs = list()
         for data in dataset:
             if (qa := Vicuna.process_vicuna_conversations(data, input_max_length=input_max_length)) is not None:
