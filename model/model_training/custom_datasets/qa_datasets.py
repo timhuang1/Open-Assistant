@@ -482,7 +482,6 @@ class LocalQA(Dataset):
         self,
         dataset_name: str,
         data_dir: str | Path,
-        input_file_path: str | Path,
         cache_dir: str | Path,
         mode: str = "sft",
         input_max_length: int = 32 * 1024,
