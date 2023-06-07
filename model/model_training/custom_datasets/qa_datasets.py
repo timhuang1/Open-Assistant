@@ -13,7 +13,7 @@ from urllib.request import urlopen
 
 import numpy as np
 import requests
-from datasets import load_dataset
+from datasets import Features, load_dataset
 from model_training.custom_datasets.formatting import DatasetEntry, create_dataset_entry_qa
 from model_training.custom_datasets.utils import _filter_by_words
 from torch import Generator
@@ -474,6 +474,61 @@ def load_alpaca_dataset(
     train = AlpacaBaseDataset(process_split(splits[0]), mode=mode)
     val = AlpacaBaseDataset(process_split(splits[1]), mode=mode)
     return train, val
+
+
+class LocalQA(Dataset):
+
+    def __init__(
+        self,
+        dataset_name: str,
+        data_dir: str | Path,
+        input_file_path: str | Path,
+        cache_dir: str | Path,
+        mode: str = "sft",
+        input_max_length: int = 32 * 1024,
+        manual_seed: int = 287631038922,
+        **kwargs
+    ) -> None:
+        super().__init__()
+        
+        if mode not in ("sft", "rl"):
+            raise NotImplementedError(f"Currently only the modes 'sft' and 'rl' are implemented. Received {mode}.")
+        self.mode = mode
+        self.name = dataset_name
+        assert (input_file_path := kwargs.get("input_file_path")) is not None, "Loading LocalQA ds requires passing input_file_path"
+        dataset_feature = Features.from_dict(
+            {
+                "instruction": {'dtype': 'string', 'id': None, '_type': 'Value'},
+                "input": {'dtype': 'string', 'id': None, '_type': 'Value'},
+                "output": {'dtype': 'string', 'id': None, '_type': 'Value'},
+            }
+        )
+        dataset = load_dataset(data_dir, data_files=input_file_path, features=dataset_feature, cache_dir=cache_dir)
+        self.pairs = self.process_qa_samples(dataset)
+
+    def process_qa_samples(self, dataset: Dataset) -> list[DatasetEntry]:
+        data = []
+
+        for row in dataset:
+            question = row["instruction"]
+            if len(row["input"]) > 0:
+                input_ = "{}\n{}".format(question, row["input"])
+            else:
+                input_ = question
+
+            if (_filter_by_words(input_) is None) or (_filter_by_words(row["output"]) is None):
+                continue
+
+            ds_entry = create_dataset_entry_qa(mode='sft', questions=[input_], answers=[row["output"]])
+            data.append(ds_entry)
+        return data
+
+    def __len__(self) -> int:
+        return len(self.pairs)
+
+    def __getitem__(self, index: int) -> DatasetEntry:
+        pair = self.pairs[index]
+        return pair
 
 
 class Vicuna(Dataset):

@@ -21,6 +21,7 @@ from model_training.custom_datasets.qa_datasets import (
     Vicuna,
     WebGPT,
     load_alpaca_dataset,
+    LocalQA,
 )
 from model_training.custom_datasets.rank_datasets import AugmentedOA
 from model_training.custom_datasets.summarization import HFSummary, HFSummaryPairs, SummarizationDataset
@@ -97,6 +98,7 @@ def get_one_dataset(
         assert dataset_name in RM_DATASETS, f"Dataset {dataset_name} not supported for reward modeling"
 
     data_path = data_path or conf.cache_dir
+    cache_dir = conf.cache_dir or data_path
     dataset_name = dataset_name.lower()
 
     if dataset_name in QA_DATASETS:
@@ -173,7 +175,8 @@ def get_one_dataset(
     elif dataset_name == "gpteacher_roleplay":
         dataset = GPTeacher_Roleplay(cache_dir=data_path, mode=mode, **kwargs)
     elif dataset_name in ("en_write_tree", "zh_write_tree"):
-        train, eval = load_alpaca_dataset(dataset_name, val_split=val_split, cache_dir=data_path, mode=mode, **kwargs)
+        # train, eval = load_alpaca_dataset(dataset_name, val_split=val_split, cache_dir=data_path, mode=mode, **kwargs)
+        dataset = LocalQA(dataset_name, data_dir=data_path, cache_dir=cache_dir, mode=mode, **kwargs)
     else:
         raise ValueError(f"Unknown dataset {dataset_name}")
 
