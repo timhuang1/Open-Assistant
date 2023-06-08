@@ -13,6 +13,14 @@ from torch.utils.data import Dataset
 
 # postfix prompt
 TRANSLATION_PROMPT = {
+    "zh-cn": [  # simplified or any chinese which was not mentioned
+        "Translate to chinese simplified: {}",
+        "{}\nTranslate to chinese",
+        "{} give me the chinese translation",
+        "翻译成中文\n{}",
+        "{}\n这句中文翻译怎么写？",
+        "我需要这句话的中文翻译:\n{}",
+    ],
     "zh": [  # simplified or any chinese which was not mentioned
         "Translate to chinese simplified: {}",
         "{}\nTranslate to chinese",
@@ -162,7 +170,8 @@ class TEDTalk(TranslationPair):
             [load_dataset("ted_talks_iwslt", language_pair=lang_pairs, year=year)[split]
              for year in ("2014", "2015", "2016")]
         )
-        src, tgt = pair.split("-")
+        # src, tgt = pair.split("-")
+        src, tgt = lang_pairs
         for row in dataset:
             row = row["translation"]
             if random.random() > 0.5:
