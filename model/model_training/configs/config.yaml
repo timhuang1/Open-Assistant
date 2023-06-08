@@ -233,7 +233,7 @@ effidit_sft:
     #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/generated_chat/
     - local_zhihu-kol:
         val_split: 0.01
-        input_file_path: zhihu_kol.jsonl
+        input_file_path: sampled_zhihu_kol.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/zhihu_kol/
     - share_gpt_zh:
         val_split: 0.01
