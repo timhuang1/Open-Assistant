@@ -76,7 +76,10 @@ LOCAL_QA_DATASETS = [
     "en_write_tree",
     "zh_write_tree",
     "local_zhihu-kol",
-    "bl_self_instruct_qa"
+    "bl_self_instruct_qa",
+    "bl_school_math",
+    "bl_generated_chat",
+
 ]
 
 LOCAL_DIALOG_DATASETS = [
