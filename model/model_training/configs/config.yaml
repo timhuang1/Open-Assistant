@@ -239,12 +239,19 @@ effidit_sft:
     #     val_split: 0.01
     #     input_file_path: sharegpt_zh.jsonl
     #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/sharegpt_zh_clean/
-    # - bl_self_instruct:
+    # - bl_self_instruct_qa:
     #     val_split: 0.01
-    #     input_file_path: 
-    #     data_path: 
+    #     input_file_path: self_instruct_qa.jsonl
+    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_qa/
+    # - bl_self_instruct_dialog:
+    #     val_split: 0.01
+    #     input_file_path: self_instruct_dialog.jsonl
+    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_dialog/
+    - sef_chat:
+        val_split: 0.01
+        input_file_path: self_chat.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat/
     - wmt2019_zh-en
-    - wmt2019_en-zh
     - ted_trans_zh-en
     - ted_trans_en-zh
     - kuaibao_lm:

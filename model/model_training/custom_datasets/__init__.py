@@ -76,10 +76,12 @@ LOCAL_QA_DATASETS = [
     "en_write_tree",
     "zh_write_tree",
     "local_zhihu-kol",
+    "bl_self_instruct_qa"
 ]
 
 LOCAL_DIALOG_DATASETS = [
     "share_gpt_zh",
+    "bl_self_instruct_dialog"
 ]
 
 LOCAL_LM_DATASETS = [
