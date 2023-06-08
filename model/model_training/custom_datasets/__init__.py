@@ -81,7 +81,8 @@ LOCAL_QA_DATASETS = [
 
 LOCAL_DIALOG_DATASETS = [
     "share_gpt_zh",
-    "bl_self_instruct_dialog"
+    "bl_self_instruct_dialog",
+    "sef_chat",   
 ]
 
 LOCAL_LM_DATASETS = [

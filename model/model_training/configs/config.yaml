@@ -247,10 +247,10 @@ effidit_sft:
     #     val_split: 0.01
     #     input_file_path: self_instruct_dialog.jsonl
     #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_dialog/
-    - sef_chat:
-        val_split: 0.01
-        input_file_path: self_chat.jsonl
-        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat/
+    # - sef_chat:
+    #     val_split: 0.01
+    #     input_file_path: self_chat.jsonl
+    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat/
     - wmt2019_zh-en
     - ted_trans_zh-en
     - ted_trans_en-zh

@@ -18,7 +18,7 @@ TRANSLATION_PROMPT = {
         "{}, translate to chinese",
         "{} give me the chinese translation",
         "翻译成中文: {}",
-        "{} 这句中文翻译怎麽写？",
+        "{} 这句中文翻译怎么写？",
         "我需要这句话的中文翻译: {}",
     ],
     "zh-tw": [  # WMT code
