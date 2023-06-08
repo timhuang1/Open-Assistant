@@ -245,6 +245,8 @@ effidit_sft:
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_qa/
     - bl_self_instruct_dialog:
         val_split: 0.01
+        human_col: human
+        assistant_col: assistant
         input_file_path: self_instruct_dialog.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_dialog/
     - sef_chat:

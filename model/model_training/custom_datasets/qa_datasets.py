@@ -27,6 +27,8 @@ re_single_reference_remove = re.compile(r"\[\s?\d+\s?\]")
 re_whitespace_newline_match = re.compile(r"^[\s\n]*$")
 
 
+DEFAULT_HUMAN_COL = "human"
+DEFAULT_ASSISTANT_COL = "gpt"
 LINKING_CHARS = ["\n", "\n\n", " "]
 
 
@@ -499,8 +501,10 @@ class LocalDialogue(Dataset):
         # self.pairs = self.process_dialog_samples(dataset["train"])
         dataset = [json.loads(ln) for ln in open(os.path.join(data_dir, input_file_path)).readlines()]
         self.pairs = list()
+        human_col = kwargs.get("human_col", DEFAULT_HUMAN_COL)
+        assistant_col = kwargs.get("assistant_col", DEFAULT_ASSISTANT_COL)
         for data in dataset:
-            if (qa := Vicuna.process_vicuna_conversations(data, input_max_length=input_max_length)) is not None:
+            if (qa := Vicuna.process_vicuna_conversations(data, input_max_length=input_max_length, human_col=human_col, assistant_col=assistant_col)) is not None:
                 if len(qa[0]) > 0 and len(qa[0]) == len(qa[1]):
                     self.pairs.append(create_dataset_entry_qa(mode="sft", questions=qa[0], answers=qa[1], ))
 
@@ -571,7 +575,10 @@ class Vicuna(Dataset):
 
     @staticmethod
     def process_vicuna_conversations(
-        data: list[dict[str, None | str]], input_max_length: int
+        data: list[dict[str, None | str]],
+        input_max_length: int,
+        human_col: str = DEFAULT_HUMAN_COL,
+        assistant_col: str = DEFAULT_ASSISTANT_COL,
     ) -> tuple[list[str], list[str]] | None:
         role = None
         messages = []
@@ -584,9 +591,9 @@ class Vicuna(Dataset):
             speaker = line["from"]  # 'human' or 'gpt'
             message = line["value"]
             if message is None or message == "":
-                if speaker == "gpt":
+                if speaker == assistant_col:
                     return None
-                elif speaker == "human":
+                elif speaker == human_col:
                     # replace empty messages with one of the following
                     message = random.choice(["...", "Please continue", "Go on", ""])
             # remove markdown escaping in revision 192ab2185289094fc556ec8ce5ce1e8e587154ca
@@ -599,18 +606,18 @@ class Vicuna(Dataset):
 
             if role != speaker:
                 if role is not None:
-                    if role == "human":
+                    if role == human_col:
                         questions.append("\n".join(messages)[:input_max_length])
-                    if role == "gpt":
+                    if role == assistant_col:
                         answers.append("\n".join(messages)[:input_max_length])
                     messages = []
                 role = speaker
             messages.append(message.strip())
 
         if role is not None and len(messages) > 0:
-            if role == "human":
+            if role == human_col:
                 questions.append("\n".join(messages)[:input_max_length])
-            if role == "gpt":
+            if role == assistant_col:
                 answers.append("\n".join(messages)[:input_max_length])
         return questions, answers
 
