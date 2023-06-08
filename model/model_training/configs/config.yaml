@@ -243,6 +243,10 @@ effidit_sft:
     #     val_split: 0.01
     #     input_file_path: 
     #     data_path: 
+    - wmt2019_zh-en
+    - wmt2019_en-zh
+    - ted_trans_zh-en
+    - ted_trans_en-zh
     - kuaibao_lm:
         val_split: 0.01
         input_file_path: merge_top15k_dedup.jsonl
