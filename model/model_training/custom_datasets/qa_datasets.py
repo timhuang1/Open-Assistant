@@ -511,10 +511,6 @@ class LocalDialogue(Dataset):
         dialogue = self.pairs[index]
         return dialogue
 
-    def process_dialog_samples(self, dataset: Dataset) -> list[DatasetEntry]:
-    
-        return
-
 
 class LocalQA(Dataset):
 

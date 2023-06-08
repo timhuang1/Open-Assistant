@@ -215,42 +215,42 @@ oasst_only:
 effidit_sft:
   save_strategy: epoch
   datasets:
-    # - en_write_tree:
-    #     val_split: 0.05
-    #     input_file_path: merges_en.jsonl
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/
-    # - zh_write_tree:
-    #     val_split: 0.05
-    #     input_file_path: merge_0428_clean_ds.jsonl
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/
-    # - bl_school_math:
-    #     val_split: 0.01
-    #     input_file_path: school_math_0.25M.jsonl
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/school_math/
-    # - bl_generated_chat:
-    #     val_split: 0.01
-    #     input_file_path: generated_chat_0.4M.jsonl
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/generated_chat/
-    # - local_zhihu-kol:
-    #     val_split: 0.01
-    #     input_file_path: 
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/generated_chat/
-    # - share_gpt_zh:
-    #     val_split: 0.01
-    #     input_file_path: sharegpt_zh.jsonl
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/sharegpt_zh_clean/
-    # - bl_self_instruct_qa:
-    #     val_split: 0.01
-    #     input_file_path: self_instruct_qa.jsonl
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_qa/
-    # - bl_self_instruct_dialog:
-    #     val_split: 0.01
-    #     input_file_path: self_instruct_dialog.jsonl
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_dialog/
-    # - sef_chat:
-    #     val_split: 0.01
-    #     input_file_path: self_chat.jsonl
-    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat/
+    - en_write_tree:
+        val_split: 0.05
+        input_file_path: merges_en.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/en_write_tree/
+    - zh_write_tree:
+        val_split: 0.05
+        input_file_path: zh_write_tree.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/zh_write_tree/
+    - bl_school_math:
+        val_split: 0.01
+        input_file_path: school_math_0.25M.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/school_math/
+    - bl_generated_chat:
+        val_split: 0.01
+        input_file_path: generated_chat_0.4M.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/generated_chat/
+    - local_zhihu-kol:
+        val_split: 0.01
+        input_file_path: zhihi_kol.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/zhihi_kol/
+    - share_gpt_zh:
+        val_split: 0.01
+        input_file_path: sharegpt_zh.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/sharegpt_zh_clean/
+    - bl_self_instruct_qa:
+        val_split: 0.01
+        input_file_path: self_instruct_qa.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_qa/
+    - bl_self_instruct_dialog:
+        val_split: 0.01
+        input_file_path: self_instruct_dialog.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_dialog/
+    - sef_chat:
+        val_split: 0.01
+        input_file_path: self_chat.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat/
     - wmt2019_zh-en
     - ted_trans_zh-en
     - ted_trans_en-zh
