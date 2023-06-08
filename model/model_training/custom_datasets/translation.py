@@ -8,18 +8,18 @@
 """
 import random
 
-from datasets import load_dataset
+from datasets import load_dataset, concatenate_datasets
 from torch.utils.data import Dataset
 
 # postfix prompt
 TRANSLATION_PROMPT = {
     "zh": [  # simplified or any chinese which was not mentioned
         "Translate to chinese simplified: {}",
-        "{}, translate to chinese",
+        "{}\nTranslate to chinese",
         "{} give me the chinese translation",
-        "翻译成中文: {}",
-        "{} 这句中文翻译怎么写？",
-        "我需要这句话的中文翻译: {}",
+        "翻译成中文\n{}",
+        "{}\n这句中文翻译怎么写？",
+        "我需要这句话的中文翻译:\n{}",
     ],
     "zh-tw": [  # WMT code
         "{}. Translate to chinese traditional",
@@ -156,7 +156,12 @@ class TEDTalk(TranslationPair):
 
     def __init__(self, pair="de-ja", split="train", year="2016", mix_prob=0.2, maximum_size=100000) -> None:
         super().__init__(mix_prob=mix_prob)
-        dataset = load_dataset("ted_talks_iwslt", language_pair=pair.split("-"), year=year)[split]
+
+        lang_pairs = [lang_id if lang_id != "zh" else "zh-cn" for lang_id in pair.split("-")]
+        dataset = concatenate_datasets(
+            [load_dataset("ted_talks_iwslt", language_pair=lang_pairs, year=year)[split]
+             for year in ("2014", "2015", "2016")]
+        )
         src, tgt = pair.split("-")
         for row in dataset:
             row = row["translation"]
