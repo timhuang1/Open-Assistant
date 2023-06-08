@@ -235,10 +235,18 @@ effidit_sft:
     #     val_split: 0.01
     #     input_file_path: 
     #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/generated_chat/
-    - share_gpt_zh:
+    # - share_gpt_zh:
+    #     val_split: 0.01
+    #     input_file_path: sharegpt_zh.jsonl
+    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/sharegpt_zh_clean/
+    # - bl_self_instruct:
+    #     val_split: 0.01
+    #     input_file_path: 
+    #     data_path: 
+    - kuaibao_lm:
         val_split: 0.01
-        input_file_path: sharegpt_zh.jsonl
-        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/sharegpt_zh_clean/
+        input_file_path: merge_top15k_dedup.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/kuaibao_lm
   sort_by_length: false
   use_custom_sampler: false
 

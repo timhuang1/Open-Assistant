@@ -7,7 +7,7 @@ import numpy as np
 from model_training.custom_datasets.extra_rm_datasets import load_anthropic_rlhf, load_hellaswag, load_shp
 from model_training.custom_datasets.instruction import INSTRUCTION_DATASETS, InstructionDataset
 from model_training.custom_datasets.oasst_dataset import load_oasst_export
-from model_training.custom_datasets.pretrain_datasets import RedPajama
+from model_training.custom_datasets.pretrain_datasets import RedPajama, LocalLM
 from model_training.custom_datasets.prompt_dialogue import Gpt4All, load_oig_file
 from model_training.custom_datasets.qa_datasets import (
     SODA,
@@ -22,7 +22,7 @@ from model_training.custom_datasets.qa_datasets import (
     WebGPT,
     load_alpaca_dataset,
     LocalQA,
-    LocalDialogue,
+    LocalDialogue
 )
 from model_training.custom_datasets.rank_datasets import AugmentedOA
 from model_training.custom_datasets.summarization import HFSummary, HFSummaryPairs, SummarizationDataset
@@ -80,6 +80,10 @@ LOCAL_QA_DATASETS = [
 
 LOCAL_DIALOG_DATASETS = [
     "share_gpt_zh",
+]
+
+LOCAL_LM_DATASETS = [
+    "kuaibao_lm",
 ]
 
 
@@ -189,6 +193,8 @@ def get_one_dataset(
         dataset = LocalQA(dataset_name, data_dir=data_path, cache_dir=cache_dir, mode=mode, **kwargs)
     elif dataset_name in LOCAL_DIALOG_DATASETS:
         dataset = LocalDialogue(dataset_name, data_dir=data_path, cache_dir=cache_dir, mode=mode, **kwargs)
+    elif dataset_name in LOCAL_LM_DATASETS:
+        dataset = LocalLM(dataset_name, data_dir=data_path, cache_dir=cache_dir, mode=mode, **kwargs)
     else:
         raise ValueError(f"Unknown dataset {dataset_name}")
 
