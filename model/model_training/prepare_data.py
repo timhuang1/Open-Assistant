@@ -272,7 +272,7 @@ if __name__ == "__main__":
             for k, v in flatten_message.items():
                 if k != "offset_mapping":
                     res[k].append(v)
-            res["label_mask"].append(label_mask)
+            # res["label_mask"].append(label_mask)
             # res["labels"] = [[-100] * len(src_ids) + tgt_ids for src_ids, tgt_ids in zip(model_inputs["input_ids"], labels["input_ids"])]
             labels = np.array(flatten_message.input_ids)
             labels[~label_mask] = -100
@@ -319,6 +319,7 @@ if __name__ == "__main__":
             # Use the pool's map function to apply process_data to each index in the dataset
             processed_dataset = list(pool.map(multiprocess_helper, range(len(train))))
         dataset = Dataset.from_list(processed_dataset)
+        dataset = dataset.shuffle()
         tokenized_datasets = dataset.map(
             messages_tokenize_function,
             batched=True,
