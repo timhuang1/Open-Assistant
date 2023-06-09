@@ -1,6 +1,7 @@
 """
     These are in the form of 'INSTRUCTION', 'RESPONSE'
 """
+import random
 from datasets import load_dataset
 from model_training.custom_datasets.formatting import DatasetEntry, create_dataset_entry_qa
 from model_training.custom_datasets.utils import _filter_by_words
@@ -29,7 +30,7 @@ INSTRUCTION_DATASETS = {
 
 
 class InstructionDataset(Dataset):
-    def __init__(self, dataset, cache_dir, split, mode="sft"):
+    def __init__(self, dataset, cache_dir, split, mode="sft", max_count=None):
         assert mode in ("sft", "rl")
         self.name = dataset
         self.mode = mode
@@ -44,6 +45,9 @@ class InstructionDataset(Dataset):
             self.response_column = "RESPONSE"
 
         ds = load_dataset(INSTRUCTION_DATASETS[dataset], cache_dir=cache_dir, split=split)
+        if max_count is not None and 0 < max_count < len(ds) + 100:
+            ds = ds.select(random.sample(range(len(ds)), max_count + 100))
+
         self.dataset = []
         num_invalid = 0
         for i in range(len(ds)):
