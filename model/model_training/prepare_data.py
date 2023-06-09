@@ -336,7 +336,7 @@ if __name__ == "__main__":
             pack_short_dataset = short_pack_ds.map(
                 pairwise_group_texts,
                 batched=True,
-                num_proc=training_conf.preprocessing_num_workers,
+                # num_proc=1,
                 load_from_cache_file=False,
                 desc="Grouping texts in chunks",
             )
