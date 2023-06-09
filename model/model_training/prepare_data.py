@@ -152,8 +152,9 @@ if __name__ == "__main__":
         #     os.path.join(training_conf.local_dataset_dir, f"{training_conf.local_dataset_subname}_evals.pt")
         # assert os.path.isfile(train_file) and os.path.isfile(eval_file), f"Invalid local_dataset file: {train_file}, {eval_file}"
         # train, evals = torch.load(train_file), torch.load(eval_file)
-        assert all([os.path.isfile(pt_filename) for pt_filename in training_conf.local_dataset_files]), f"Invalid pt files: {training_conf.local_dataset_files}"
-        all_sub_ds = [torch.load(pt_filename) for pt_filename in training_conf.local_dataset_files]
+        saved_files = [os.path.join(training_conf.local_dataset_dir, pt_filename) for pt_filename in training_conf.local_dataset_files]
+        assert all([os.path.isfile(filename) for filename in saved_files]), f"Invalid pt files: {training_conf.local_dataset_files}"
+        all_sub_ds = [torch.load(filename) for filename in training_conf.local_dataset_files]
         train = ConcatDataset(all_sub_ds)
     else:
         train, evals = get_dataset(training_conf)
