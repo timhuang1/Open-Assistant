@@ -30,7 +30,7 @@ INSTRUCTION_DATASETS = {
 
 
 class InstructionDataset(Dataset):
-    def __init__(self, dataset, cache_dir, split, mode="sft", max_count=None):
+    def __init__(self, dataset, cache_dir, split, mode="sft", max_count=None, **kwargs):
         assert mode in ("sft", "rl")
         self.name = dataset
         self.mode = mode

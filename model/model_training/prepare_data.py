@@ -161,7 +161,7 @@ if __name__ == "__main__":
     if "concat_save_to_local" in training_conf.configs:
         os.makedirs(training_conf.concat_save_dir, exist_ok=True)
         torch.save(train, os.path.join(training_conf.concat_save_dir, f"{training_conf.concat_save_subname}.pt"))
-        torch.save(evals, os.path.join(training_conf.concat_save_dir, f"{training_conf.concat_save_subname}_evals.pt"))
+        # torch.save(evals, os.path.join(training_conf.concat_save_dir, f"{training_conf.concat_save_subname}_evals.pt"))
 
     show_dataset_stats = (training_conf.verbose or training_conf.show_dataset_stats) and (
         not training_conf.deepspeed or training_conf.local_rank == 0
@@ -179,14 +179,15 @@ if __name__ == "__main__":
                 if hasattr(d, "name"):
                     name += f" ({d.name})"
             print(f"{name}: {len(d)} ({len(d) / total:.2%})")
-
-        if "eval" in locals():
             print(f"\nTotal train: {total}")
             print("-" * 80)
+
+        if "evals" in locals():
             print("Evaluation set sizes:")
             total_eval = sum(len(x) for x in evals.values())
             for k, d in evals.items():
                 print(f"{k}: {len(d)} ({len(d) / total_eval:.2%})")
+            
             print(f"\nTotal eval: {total_eval}")
             print("-" * 80)
 
@@ -238,6 +239,7 @@ if __name__ == "__main__":
                     if k != "offset_mapping":
                         res[k].append(v)
                 res["labels"].append(flatten_message["input_ids"])
+
                 continue
 
             message_indices: Optional[list[int]] = None
