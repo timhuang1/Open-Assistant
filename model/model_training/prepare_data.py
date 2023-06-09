@@ -8,6 +8,7 @@ import sys
 import random
 import numpy as np
 from functools import partial
+from itertools import chain
 from collections import defaultdict
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from datasets import Dataset
@@ -199,7 +200,7 @@ if __name__ == "__main__":
                 system_add_length=collate_fn.system_add_length,
             )
         elif isinstance(messages, DatasetEntryLm):
-            messages = messages.text
+            messages = [messages.text]
             pretrain_dataset = True
         else:
             messages = list(messages)
@@ -277,6 +278,35 @@ if __name__ == "__main__":
             res["labels"].append(labels)
         return res
 
+    def pairwise_group_texts(
+        examples: Dict[str, List[List[Union[str, bool]]]]
+    ) -> Dict[str, List[int]]:
+        # get all length
+        sample_length = [len(ids) for ids in examples["input_ids"]]
+        
+        def get_chunks(numbers, N):
+            current_sum, start_idx, last_idx = 0, 0, None
+            segs = list()
+            for idx, number in enumerate(numbers):
+                if current_sum + number <= N:
+                    current_sum += number
+                else:
+                    last_idx = idx
+                    segs.append((start_idx, last_idx))
+                    start_idx = idx
+                    current_sum = number
+            if last_idx is not None and last_idx < len(numbers):
+                segs.append((last_idx, len(numbers)))
+            return segs
+
+        chunk_segs = get_chunks(sample_length, collate_fn.max_length)
+        # print(f"chunk_segs: {chunk_segs}")
+        result = {k: [] for k in examples.keys()}
+        for start_idx, last_idx in chunk_segs:
+            for k in examples.keys():
+                result[k].append(list(chain(*examples[k][start_idx: last_idx])))
+        return result
+
     def multiprocess_helper(index):
         # This function will be run in a separate process
         data = train[index]
@@ -297,3 +327,13 @@ if __name__ == "__main__":
             desc="Running tokenizer on dataset",
         )
         tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, training_conf.dataset_save_subname))
+        if collate_fn.samples_mixing:
+            short_dataset = tokenized_datasets.filter(lambda x: x["input_ids"] <= collate_fn.mix_length_threshold)
+            long_dataset = tokenized_datasets.filter(lambda x: x["input_ids"] > collate_fn.mix_length_threshold)
+            pack_short_dataset = short_dataset.map(
+                pairwise_group_texts,
+                batched=True,
+                num_proc=training_conf.preprocessing_num_workers,
+                load_from_cache_file=False,
+                desc="Grouping texts in chunks",
+            )
