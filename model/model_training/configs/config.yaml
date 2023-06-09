@@ -101,7 +101,8 @@ get_local_dataset:
   local_dataset_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/saved_concat_dataset/effidit_sft_warmup
   local_dataset_files:
     - effidit_sft_warmup_en_train.pt
-    - effidit_sft_warmup_en_train_stackexchang_only.pt
+    - effidit_sft_warmup_en_train_stackexchange_3m.pt
+    - effidit_sft_warmup_zh_train.pt
 
 concat_save_to_local:
   concat_save_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/saved_concat_dataset/
@@ -301,44 +302,46 @@ effidit_sft_zh:
   datasets:
     # zh
     - zh_write_tree:
-        val_split: 0.05
+        val_split: 0.001
         input_file_path: zh_write_tree.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/zh_write_tree/
     - bl_school_math:
-        val_split: 0.01
+        val_split: 0.001
         input_file_path: school_math_0.25M.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/school_math/
     - bl_generated_chat:
-        val_split: 0.01
+        val_split: 0.001
         input_file_path: generated_chat_0.4M.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/generated_chat/
     - local_zhihu-kol:
-        val_split: 0.01
+        val_split: 0.001
         input_file_path: sampled_zhihu_kol.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/zhihu_kol/
     - share_gpt_zh:
-        val_split: 0.01
+        val_split: 0.001
         input_file_path: sharegpt_zh.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/sharegpt_zh_clean/
     - bl_self_instruct_qa:
-        val_split: 0.01
+        max_val_set: 1000
+        val_split: 0.001
         input_file_path: self_instruct_qa.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_qa/
     - bl_self_instruct_dialog:
-        val_split: 0.01
+        max_val_set: 1000
+        val_split: 0.001
         human_col: human
         assistant_col: assistant
         input_file_path: self_instruct_dialog.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_dialog/
     - sef_chat:
-        val_split: 0.01
+        val_split: 0.001
         input_file_path: self_chat.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat/
-    - wmt2019_zh-en
-    - ted_trans_zh-en
-    - ted_trans_en-zh
+    # - wmt2019_zh-en
+    # - ted_trans_zh-en
+    # - ted_trans_en-zh
     - kuaibao_lm:
-        val_split: 0.01
+        val_split: 0.001
         input_file_path: merge_top15k_dedup.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/kuaibao_lm
   sort_by_length: false
