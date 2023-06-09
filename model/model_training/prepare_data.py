@@ -322,7 +322,7 @@ if __name__ == "__main__":
         tokenized_datasets = dataset.map(
             messages_tokenize_function,
             batched=True,
-            num_proc=training_conf.preprocessing_num_workers,
+            # num_proc=training_conf.preprocessing_num_workers,
             remove_columns=dataset.column_names,
             load_from_cache_file=False,
             desc="Running tokenizer on dataset",
