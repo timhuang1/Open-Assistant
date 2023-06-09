@@ -101,9 +101,9 @@ per_digit_tokens:
 get_local_dataset:
   local_dataset_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/saved_concat_dataset/effidit_sft_warmup
   local_dataset_files:
-    # - effidit_sft_warmup_en_train.pt
-    # # - effidit_sft_warmup_en_train_stackexchange_3m.pt
-    # # - effidit_sft_warmup_zh_train.pt
+    - effidit_sft_warmup_en_train.pt
+    - effidit_sft_warmup_en_train_stackexchange_3m.pt
+    - effidit_sft_warmup_zh_train.pt
 
 concat_save_to_local:
   concat_save_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/saved_concat_dataset/
