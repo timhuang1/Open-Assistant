@@ -320,11 +320,16 @@ if __name__ == "__main__":
             processed_dataset = list(pool.map(multiprocess_helper, range(len(train))))
         dataset = Dataset.from_list(processed_dataset)
         dataset = dataset.shuffle()
-        tokenized_datasets = dataset.map(
+        # save and load
+        internal_cache_dir = os.path.join(training_conf.cache_dir, f"_internal_ds_{training_conf.dataset_save_subname}")
+        dataset.save_to_disk(internal_cache_dir)
+        re_load_ds = Dataset.load_from_disk(internal_cache_dir)
+        del dataset
+        tokenized_datasets = re_load_ds.map(
             messages_tokenize_function,
             batched=True,
             # num_proc=training_conf.preprocessing_num_workers,
-            remove_columns=dataset.column_names,
+            remove_columns=re_load_ds.column_names,
             load_from_cache_file=False,
             desc="Running tokenizer on dataset",
         )
