@@ -328,7 +328,7 @@ if __name__ == "__main__":
         tokenized_datasets = re_load_ds.map(
             messages_tokenize_function,
             batched=True,
-            # num_proc=training_conf.preprocessing_num_workers,
+            num_proc=training_conf.preprocessing_num_workers,
             remove_columns=re_load_ds.column_names,
             load_from_cache_file=False,
             desc="Running tokenizer on dataset",
@@ -342,7 +342,7 @@ if __name__ == "__main__":
             pack_short_dataset = short_pack_ds.map(
                 pairwise_group_texts,
                 batched=True,
-                # num_proc=1,
+                num_proc=training_conf.preprocessing_num_workers,
                 load_from_cache_file=False,
                 desc="Grouping texts in chunks",
             )
