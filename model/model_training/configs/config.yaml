@@ -227,11 +227,11 @@ effidit_sft_en:
         val_split: 0.01
     - poem_instructions:
         val_split: 0.025
-    - oa_stackexchange:
-        max_count: 3000000
-        val_split: 0.01
-        fraction: 0.1
-        max_val_set: 1000
+    # - oa_stackexchange:
+    #     max_count: 3000000
+    #     val_split: 0.01
+    #     fraction: 0.1
+    #     max_val_set: 1000
     - tell_a_joke:
         val_split: 0.01
         max_val_set: 250
