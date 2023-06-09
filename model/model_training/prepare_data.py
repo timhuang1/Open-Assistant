@@ -37,7 +37,7 @@ from model_training.utils.utils import (
     read_yamls,
 )
 from torch import nn
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader, Subset, ConcatDataset
 from tqdm import tqdm
 
 
@@ -147,17 +147,20 @@ if __name__ == "__main__":
     )
 
     if "get_local_dataset" in training_conf.configs:
-        train_file, eval_file =\
-            os.path.join(training_conf.local_dataset_dir, f"{training_conf.local_dataset_subname}_train.pt"),\
-            os.path.join(training_conf.local_dataset_dir, f"{training_conf.local_dataset_subname}_evals.pt")
-        assert os.path.isfile(train_file) and os.path.isfile(eval_file), f"Invalid local_dataset file: {train_file}, {eval_file}"
-        train, evals = torch.load(train_file), torch.load(eval_file)
+        # train_file, eval_file =\
+        #     os.path.join(training_conf.local_dataset_dir, f"{training_conf.local_dataset_subname}_train.pt"),\
+        #     os.path.join(training_conf.local_dataset_dir, f"{training_conf.local_dataset_subname}_evals.pt")
+        # assert os.path.isfile(train_file) and os.path.isfile(eval_file), f"Invalid local_dataset file: {train_file}, {eval_file}"
+        # train, evals = torch.load(train_file), torch.load(eval_file)
+        assert all([os.path.isfile(pt_filename) for pt_filename in training_conf.local_dataset_files]), f"Invalid pt files: {training_conf.local_dataset_files}"
+        all_sub_ds = [torch.load(pt_filename) for pt_filename in training_conf.local_dataset_files]
+        train = ConcatDataset(all_sub_ds)
     else:
         train, evals = get_dataset(training_conf)
     
     if "concat_save_to_local" in training_conf.configs:
         os.makedirs(training_conf.concat_save_dir, exist_ok=True)
-        torch.save(train, os.path.join(training_conf.concat_save_dir, f"{training_conf.concat_save_subname}_train.pt"))
+        torch.save(train, os.path.join(training_conf.concat_save_dir, f"{training_conf.concat_save_subname}.pt"))
         torch.save(evals, os.path.join(training_conf.concat_save_dir, f"{training_conf.concat_save_subname}_evals.pt"))
 
     show_dataset_stats = (training_conf.verbose or training_conf.show_dataset_stats) and (
@@ -177,14 +180,15 @@ if __name__ == "__main__":
                     name += f" ({d.name})"
             print(f"{name}: {len(d)} ({len(d) / total:.2%})")
 
-        print(f"\nTotal train: {total}")
-        print("-" * 80)
-        print("Evaluation set sizes:")
-        total_eval = sum(len(x) for x in evals.values())
-        for k, d in evals.items():
-            print(f"{k}: {len(d)} ({len(d) / total_eval:.2%})")
-        print(f"\nTotal eval: {total_eval}")
-        print("-" * 80)
+        if "eval" in locals():
+            print(f"\nTotal train: {total}")
+            print("-" * 80)
+            print("Evaluation set sizes:")
+            total_eval = sum(len(x) for x in evals.values())
+            for k, d in evals.items():
+                print(f"{k}: {len(d)} ({len(d) / total_eval:.2%})")
+            print(f"\nTotal eval: {total_eval}")
+            print("-" * 80)
 
     def raw_to_arraw(
         messages: Union[DatasetEntrySft, DatasetEntryLm]
