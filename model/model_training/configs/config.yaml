@@ -65,6 +65,7 @@ defaults:
   fuse_gelu: true
   log_wandb: true
   samples_mixing: false # uses collator that mixes samples in the batch to create a single sample with possible multiple tasks within
+  mix_length_threshold: 256
   verbose: false
   output_dir: saved_model
   use_custom_sampler: false
@@ -100,9 +101,9 @@ per_digit_tokens:
 get_local_dataset:
   local_dataset_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/saved_concat_dataset/effidit_sft_warmup
   local_dataset_files:
-    # - effidit_sft_warmup_en_train.pt
+    - effidit_sft_warmup_en_train.pt
     # - effidit_sft_warmup_en_train_stackexchange_3m.pt
-    - effidit_sft_warmup_zh_train.pt
+    # - effidit_sft_warmup_zh_train.pt
 
 concat_save_to_local:
   concat_save_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/saved_concat_dataset/
@@ -112,6 +113,9 @@ ds_save_to_local:
   preprocessing_num_workers: 20
   dataset_save_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/processed_dataset
   dataset_save_subname: effidit_sft_warmup_rerun
+  samples_mixing: true
+  mix_length_threshold: 256
+  mix_probability: 0.8
 
 math:
   datasets_extra: # Will get merged with datasets

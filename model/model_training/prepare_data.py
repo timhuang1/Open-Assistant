@@ -11,7 +11,7 @@ from functools import partial
 from itertools import chain
 from collections import defaultdict
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from datasets import Dataset
+from datasets import Dataset, concatenate_datasets
 from transformers.tokenization_utils_base import PaddingStrategy, PreTrainedTokenizerBase, TruncationStrategy
 from multiprocessing import Pool
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -139,6 +139,7 @@ if __name__ == "__main__":
         random_offset_probability=training_conf.random_offset_probability,
         label_masking=training_conf.label_masking,
         samples_mixing=training_conf.samples_mixing,
+        mix_length_threshold=training_conf.mix_length_threshold,
         pad_to_multiple_of=16,
         use_system_prefix=training_conf.use_system_prefix,
         system_prefix=training_conf.system_prefix,
@@ -326,14 +327,18 @@ if __name__ == "__main__":
             load_from_cache_file=False,
             desc="Running tokenizer on dataset",
         )
-        tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, training_conf.dataset_save_subname))
         if collate_fn.samples_mixing:
-            short_dataset = tokenized_datasets.filter(lambda x: x["input_ids"] <= collate_fn.mix_length_threshold)
-            long_dataset = tokenized_datasets.filter(lambda x: x["input_ids"] > collate_fn.mix_length_threshold)
-            pack_short_dataset = short_dataset.map(
+            short_dataset = tokenized_datasets.filter(lambda x: len(x["input_ids"]) <= collate_fn.mix_length_threshold)
+            long_dataset = tokenized_datasets.filter(lambda x: len(x["input_ids"]) > collate_fn.mix_length_threshold)
+            split_res = short_dataset.train_test_split(test_size=collate_fn.mix_probability, shuffle=True)
+            short_only_ds, short_pack_ds = split_res["train"], split_res["test"]
+
+            pack_short_dataset = short_pack_ds.map(
                 pairwise_group_texts,
                 batched=True,
                 num_proc=training_conf.preprocessing_num_workers,
                 load_from_cache_file=False,
                 desc="Grouping texts in chunks",
             )
+            tokenized_datasets = concatenate_datasets([long_dataset, short_only_ds, pack_short_dataset])
+        tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, training_conf.dataset_save_subname))
