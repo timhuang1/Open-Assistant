@@ -333,6 +333,7 @@ if __name__ == "__main__":
             load_from_cache_file=False,
             desc="Running tokenizer on dataset",
         )
+        tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, training_conf.dataset_save_subname))
         if collate_fn.samples_mixing:
             short_dataset = tokenized_datasets.filter(lambda x: len(x["input_ids"]) <= collate_fn.mix_length_threshold)
             long_dataset = tokenized_datasets.filter(lambda x: len(x["input_ids"]) > collate_fn.mix_length_threshold)
@@ -347,4 +348,4 @@ if __name__ == "__main__":
                 desc="Grouping texts in chunks",
             )
             tokenized_datasets = concatenate_datasets([long_dataset, short_only_ds, pack_short_dataset])
-        tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, training_conf.dataset_save_subname))
+        tokenized_datasets.save_to_disk(os.path.join(training_conf.dataset_save_dir, f"{training_conf.dataset_save_subname}_after_pack"))

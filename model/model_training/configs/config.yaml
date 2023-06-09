@@ -110,7 +110,7 @@ concat_save_to_local:
   concat_save_subname: effidit_sft_warmup_zh
 
 ds_save_to_local:
-  preprocessing_num_workers: 20
+  preprocessing_num_workers: 70
   dataset_save_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/processed_dataset
   dataset_save_subname: effidit_sft_warmup_rerun
   samples_mixing: true
