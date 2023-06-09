@@ -179,8 +179,8 @@ if __name__ == "__main__":
                 if hasattr(d, "name"):
                     name += f" ({d.name})"
             print(f"{name}: {len(d)} ({len(d) / total:.2%})")
-            print(f"\nTotal train: {total}")
-            print("-" * 80)
+        print(f"\nTotal train: {total}")
+        print("-" * 80)
 
         if "evals" in locals():
             print("Evaluation set sizes:")
