@@ -253,6 +253,7 @@ effidit_sft_elite:
     - share_gpt_zh:
         val_split: 0.001
         input_file_path: sharegpt_zh.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/sharegpt_zh_clean/
     - wmt2019_zh-en
     - ted_trans_zh-en
     - ted_trans_en-zh
