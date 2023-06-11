@@ -93,7 +93,7 @@ TRANSLATION_PROMPT = {
 
 
 class TranslationPair(Dataset):
-    def __init__(self, mix_prob=0.2) -> None:
+    def __init__(self, mix_prob=0.1) -> None:
         super().__init__()
         self.pairs = []
         self.length = -1
@@ -112,13 +112,13 @@ class TranslationPair(Dataset):
 
             history_text = self.pairs[additional + index]
             question, answer = self.pairs[index]
-            return history_text + [question, answer]
+            return history_text + (question, answer)
 
         return self.pairs[index]
 
 
 class WMT2019(TranslationPair):
-    def __init__(self, pair="zh-en", split="train", mix_prob=0.2, maximum_size=100000) -> None:
+    def __init__(self, pair="zh-en", split="train", mix_prob=0.1, maximum_size=100000) -> None:
         super().__init__(mix_prob=mix_prob)
         dataset = load_dataset("wmt19", pair)[split]
         self.pairs = []
@@ -139,7 +139,7 @@ class WMT2019(TranslationPair):
 class DiveMT(TranslationPair):
     REMAP = {"tur": "tr", "ita": "it", "ukr": "uk", "nld": "nl", "vie": "vi", "ara": "ar"}
 
-    def __init__(self, split="train", mix_prob=0.2) -> None:
+    def __init__(self, split="train", mix_prob=0.1) -> None:
         super().__init__(mix_prob=mix_prob)
         dataset = load_dataset("GroNLP/divemt", "main")[split]
         tgt, src = "tgt_text", "src_text"
@@ -162,7 +162,7 @@ class DiveMT(TranslationPair):
 class TEDTalk(TranslationPair):
     # NOTE: DO NOT use chinese pair, mix with traditional and cantonese, not clean
 
-    def __init__(self, pair="de-ja", split="train", year="2016", mix_prob=0.2, maximum_size=100000) -> None:
+    def __init__(self, pair="de-ja", split="train", year="2016", mix_prob=0.1, maximum_size=100000) -> None:
         super().__init__(mix_prob=mix_prob)
 
         lang_pairs = [lang_id if lang_id != "zh" else "zh-cn" for lang_id in pair.split("-")]

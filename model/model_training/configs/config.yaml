@@ -212,6 +212,54 @@ oasst_only:
   sort_by_length: false
   use_custom_sampler: false
 
+effidit_sft_elite:
+  save_strategy: epoch
+  datasets:
+    - oasst_export:
+        lang: "en,de,zh,fr"
+        input_file_path: 2023-04-12_oasst_ready.trees.jsonl
+        val_split: 0.01
+    - vicuna:
+        val_split: 0.01
+        max_val_set: 800
+        fraction: 0.4
+    - dolly15k:
+        val_split: 0.01
+        max_val_set: 300
+    - grade_school_math_instructions:
+        val_split: 0.01
+    - code_alpaca:
+        val_split: 0.01
+        max_val_set: 250
+    # - red_pajama:
+    #     fraction: 0.05
+    #     max_val_set: 1000
+    - wizardlm_70k:
+        val_split: 0.01
+        max_val_set: 500
+        fraction: 0.4
+    - poem_instructions:
+        fraction: 0.5
+        val_split: 0.01
+    - en_write_tree:
+        val_split: 0.01
+        max_val_set: 250
+        input_file_path: merges_en.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/en_write_tree/
+    - zh_write_tree:
+        val_split: 0.001
+        input_file_path: zh_write_tree.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/zh_write_tree/
+    - share_gpt_zh:
+        val_split: 0.001
+        input_file_path: sharegpt_zh.jsonl
+    - wmt2019_zh-en
+    - ted_trans_zh-en
+    - ted_trans_en-zh
+  sort_by_length: false
+  use_custom_sampler: false
+
+
 effidit_sft_en_stackexchange:
   save_strategy: epoch
   datasets:
@@ -410,7 +458,7 @@ llama-7b:
   dtype: fp16
   log_dir: "llama_log_7b"
   learning_rate: 1e-5
-  model_name: /home/ubuntu/llama_hf/7B
+  model_name: /apdcephfs/share_916081/timxthuang/huggingface_models/hf_llama_7b
   output_dir: llama_model_7b
   weight_decay: 0.0
   max_length: 2048
