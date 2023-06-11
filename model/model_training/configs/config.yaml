@@ -463,7 +463,7 @@ llama-7b:
   model_name: /apdcephfs/share_916081/timxthuang/huggingface_models/hf_llama_7b
   output_dir: llama_model_7b
   weight_decay: 0.0
-  max_length: 2048
+  max_length: 1024
   warmup_steps: 100
   gradient_checkpointing: true
   gradient_accumulation_steps: 2
