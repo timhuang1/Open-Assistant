@@ -79,13 +79,15 @@ LOCAL_QA_DATASETS = [
     "bl_self_instruct_qa",
     "bl_school_math",
     "bl_generated_chat",
+    "instruct_write",
 
 ]
 
 LOCAL_DIALOG_DATASETS = [
     "share_gpt_zh",
     "bl_self_instruct_dialog",
-    "sef_chat",   
+    "sef_chat",
+    "wizard_vicuna",
 ]
 
 LOCAL_LM_DATASETS = [
@@ -136,11 +138,11 @@ def get_one_dataset(
         dataset = InstructionDataset(dataset_name, data_path, "train", **kwargs)
     elif "ted_trans" in dataset_name:
         language_pair = dataset_name.split("_")[-1]
-        dataset = TEDTalk(pair=language_pair, split="train")
+        dataset = TEDTalk(pair=language_pair, split="train", **kwargs)
     elif "wmt2019" in dataset_name:
         language_pair = dataset_name.split("_")[-1]
-        train = WMT2019(pair=language_pair, split="train")
-        eval = WMT2019(pair=language_pair, split="validation")
+        train = WMT2019(pair=language_pair, split="train", **kwargs)
+        eval = WMT2019(pair=language_pair, split="validation", **kwargs)
     elif dataset_name == "dive_mt":
         dataset = DiveMT()
     elif dataset_name == "webgpt":

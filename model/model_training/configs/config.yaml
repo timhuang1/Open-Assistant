@@ -217,7 +217,7 @@ effidit_sft_elite:
   save_strategy: epoch
   datasets:
     - oasst_export:
-        lang: "en,de,zh,fr"
+        lang: "en,zh"
         input_file_path: 2023-04-12_oasst_ready.trees.jsonl
         val_split: 0.01
     - vicuna:
@@ -229,9 +229,9 @@ effidit_sft_elite:
         max_val_set: 300
     - grade_school_math_instructions:
         val_split: 0.01
-    - code_alpaca:
-        val_split: 0.01
-        max_val_set: 250
+    # - code_alpaca:
+    #     val_split: 0.01
+    #     max_val_set: 250
     # - red_pajama:
     #     fraction: 0.05
     #     max_val_set: 1000
@@ -255,9 +255,24 @@ effidit_sft_elite:
         val_split: 0.001
         input_file_path: sharegpt_zh.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/sharegpt_zh_clean/
-    - wmt2019_zh-en
-    - ted_trans_zh-en
-    - ted_trans_en-zh
+    - instruct_write:
+        val_split: 0.001
+        input_file_path: instruct_writing.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/instruct_write/
+    - wizard_vicuna:
+        val_split: 0.001
+        input_file_path: wizard_vicuna.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/wizard_vicuna/
+    - self_chat_tiny:
+        val_split: 0.001
+        input_file_path: self_chat_tiny_subset.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat_tiny/
+    - wmt2019_zh-en:
+        max_count: 10000
+    - ted_trans_zh-en:
+        max_count: 10000
+    - ted_trans_en-zh:
+        max_count: 10000
   sort_by_length: false
   use_custom_sampler: false
 
