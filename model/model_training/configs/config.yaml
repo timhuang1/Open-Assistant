@@ -277,7 +277,7 @@ effidit_sft_elite_v1:
         input_file_path: wizardlm_eval_evol.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/wizardlm_eval_enhance/
     - wmt2019_zh-en:
-        max_count: 10000
+        max_count: 20000
     - ted_trans_zh-en:
         max_count: 10000
     - ted_trans_en-zh:
