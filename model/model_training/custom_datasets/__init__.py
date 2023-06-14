@@ -74,6 +74,7 @@ RM_DATASETS = [
 
 LOCAL_QA_DATASETS = [
     "en_write_tree",
+    "en_write_tree_dedup",
     "zh_write_tree",
     "local_zhihu-kol",
     "bl_self_instruct_qa",
