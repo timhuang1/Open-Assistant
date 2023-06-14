@@ -243,11 +243,16 @@ effidit_sft_elite_v1:
     - poem_instructions:
         fraction: 0.5
         val_split: 0.01
-    - en_write_tree:
+    # - en_write_tree:
+    #     val_split: 0.01
+    #     max_val_set: 250
+    #     input_file_path: merges_en.jsonl
+    #     data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/en_write_tree/
+    - en_write_tree_dedup:
         val_split: 0.01
         max_val_set: 250
-        input_file_path: merges_en.jsonl
-        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/en_write_tree/
+        input_file_path: merge_en_write_tree_dedup.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/en_write_tree_dedup/
     - zh_write_tree:
         val_split: 0.001
         input_file_path: zh_write_tree.jsonl
