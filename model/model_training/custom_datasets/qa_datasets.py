@@ -550,7 +550,8 @@ class LocalQA(Dataset):
 
         for row in dataset:
             question = row["instruction"]
-            if len(row["input"]) > 0:
+            # if len(row["input"]) > 0:
+            if len(row.get("input", "")) > 0:
                 input_ = "{}\n{}".format(question, row["input"])
             else:
                 input_ = question
