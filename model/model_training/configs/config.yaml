@@ -411,7 +411,7 @@ effidit_sft_zh:
         assistant_col: assistant
         input_file_path: self_instruct_dialog.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_instruct_dialog/
-    - sef_chat:
+    - self_chat:
         val_split: 0.001
         input_file_path: self_chat.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat/
