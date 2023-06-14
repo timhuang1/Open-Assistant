@@ -108,7 +108,7 @@ get_local_dataset:
 
 concat_save_to_local:
   concat_save_dir: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/oa_train/saved_concat_dataset/
-  concat_save_subname: effidit_sft_elite
+  concat_save_subname: effidit_sft_elite_v1
 
 ds_save_to_local:
   preprocessing_num_workers: 70
@@ -213,7 +213,7 @@ oasst_only:
   sort_by_length: false
   use_custom_sampler: false
 
-effidit_sft_elite:
+effidit_sft_elite_v1:
   save_strategy: epoch
   datasets:
     - oasst_export:
@@ -267,6 +267,14 @@ effidit_sft_elite:
         val_split: 0.001
         input_file_path: self_chat_tiny_subset.jsonl
         data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/self_chat_tiny/
+    - dolly_eval_evol:
+        val_split: 0.001
+        input_file_path: dolly_eval_evol.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/dolly_eval_enhance/
+    - wizardlm_eval_evol:
+        val_split: 0.001
+        input_file_path: wizardlm_eval_evol.jsonl
+        data_path: /apdcephfs/share_916081/timxthuang/paraphrase_pair_data/x_edit/div_instruct/effidit_sft/wizardlm_eval_enhance/
     - wmt2019_zh-en:
         max_count: 10000
     - ted_trans_zh-en:

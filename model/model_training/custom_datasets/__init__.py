@@ -88,6 +88,8 @@ LOCAL_DIALOG_DATASETS = [
     "bl_self_instruct_dialog",
     "sef_chat",
     "wizard_vicuna",
+    "dolly_eval_evol",
+    "wizardlm_eval_evol",
 ]
 
 LOCAL_LM_DATASETS = [
