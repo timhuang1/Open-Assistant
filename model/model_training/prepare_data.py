@@ -13,6 +13,7 @@ from collections import defaultdict
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from datasets import Dataset, concatenate_datasets
 from transformers.tokenization_utils_base import PaddingStrategy, PreTrainedTokenizerBase, TruncationStrategy
+from transformers import AutoTokenizer
 from multiprocessing import Pool
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -128,6 +129,10 @@ if __name__ == "__main__":
         sys.path.insert(1, "/apdcephfs/share_916081/timxthuang/cond_gen_git/examples/pytorch")
         from utils import BloomMinusTokenizerFast
         tokenizer = BloomMinusTokenizerFast.from_pretrained(training_conf.model_name)
+        additional_special_tokens = list(QA_SPECIAL_TOKENS.values())
+        tokenizer.add_special_tokens({"additional_special_tokens": additional_special_tokens})
+    elif "baichuan" in training_conf.model_name:
+        tokenizer = AutoTokenizer.from_pretrained(training_conf.model_name, trust_remote_code=True)
         additional_special_tokens = list(QA_SPECIAL_TOKENS.values())
         tokenizer.add_special_tokens({"additional_special_tokens": additional_special_tokens})
     else:
